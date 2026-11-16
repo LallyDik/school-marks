@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import ExcelJS from 'exceljs';
+import {readStudents,classInfo} from '../src/import-students.js';
+const wb=new ExcelJS.Workbook();const sheet=wb.addWorksheet('test');
+sheet.addRow(['כתה ט1']);sheet.addRow(['שם','תז','תאריך לידה','כתה']);
+sheet.addRow(['משפחה שם פרטי',12345678,'','ט 1']);
+sheet.addRow(['שם','מ.ז','תאריך לידה','כתה']);
+sheet.addRow(['משפחה תלמידה',12345679,'','י"א 2']);
+const parsed=await readStudents(await wb.xlsx.writeBuffer());
+assert.equal(parsed.rows.length,2);assert.equal(parsed.warnings.length,0);
+assert.equal(parsed.rows[0].identity_number,'012345678');
+assert.equal(parsed.rows[0].first_name,'שם פרטי');
+assert.equal(parsed.rows[1].grade_level,11);
+assert.deepEqual(classInfo("ט' 1"),classInfo('ט1'));
+sheet.addRow(['משפחה כפולה',12345678,'','ט1']);
+sheet.addRow(['משפחה פגומה','abc','','ט1']);
+const invalid=await readStudents(await wb.xlsx.writeBuffer());assert.equal(invalid.warnings.length,2);
+console.log('PASS: repeated Hebrew headers, class normalization, leading zeros, compound names and invalid/duplicate rows.');

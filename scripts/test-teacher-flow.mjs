@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {teachingGroups,gradeProgress,gradeSelectors} from '../src/teacher-grades.js';
+const state={year:'y',profile:{id:'teacher'},data:{classes:[{id:'a',name:'A'},{id:'b',name:'B'}],group_teachers:[{group_id:'math-a',teacher_id:'teacher'},{group_id:'english-a',teacher_id:'other'},{group_id:'math-b',teacher_id:'teacher'},{group_id:'ability',teacher_id:'teacher'}],study_groups:[{id:'math-a',class_id:'a',subject_id:'math',year_id:'y'},{id:'english-a',class_id:'a',subject_id:'english',year_id:'y'},{id:'math-b',class_id:'b',subject_id:'math',year_id:'y'},{id:'ability',subject_id:'math',year_id:'y'}],subjects:[{id:'math',name:'Math'},{id:'english',name:'English'}],terms:[],group_students:[{group_id:'math-a',student_id:'s1'},{group_id:'math-a',student_id:'s2'},{group_id:'math-a',student_id:'s3'}],grades:[{student_id:'s1',subject_id:'math',term_id:'t',grade_code:'9',assignments:90},{student_id:'s2',subject_id:'math',term_id:'t',assignments:80},{student_id:'unrelated',subject_id:'math',term_id:'t',grade_code:'9',assignments:90}]}};
+assert.deepEqual(teachingGroups(state,true).map(g=>g.id),['math-a','math-b','ability']);
+const calls=[];gradeSelectors(state,(name,label,rows)=>{calls.push({name,rows});return ''});
+assert.equal(state.group,'math-a');assert.deepEqual(calls.find(c=>c.name==='group-filter').rows.map(g=>g.id),['math-a']);
+state.gradeClass='b';gradeSelectors(state,()=> '');assert.equal(state.group,'math-b');
+state.gradeMode='abilities';gradeSelectors(state,()=> '');assert.equal(state.group,'ability');
+assert.deepEqual(gradeProgress(state.data.study_groups[0],'t',state.data),{total:3,complete:1,partial:1,missing:1});
+console.log('PASS: assigned classes, dependent subject selection, separate ability groups and completion counts.');

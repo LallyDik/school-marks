@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {canOpenPage,homeroomStudents} from '../src/permissions.js';
+const teacher={id:'t',is_admin:false};
+const classes=[{id:'c',year_id:'current',homeroom_teacher_id:'t'},{id:'old',year_id:'past',homeroom_teacher_id:'other'}];
+assert.equal(canOpenPage('evaluations',teacher,'current',classes),true);
+assert.equal(canOpenPage('evaluations',teacher,'past',classes),false);
+assert.equal(canOpenPage('evaluations',{id:'new'},'current',classes),false);
+assert.equal(canOpenPage('staff',teacher,'current',classes),false);
+const students=[{id:'own'},{id:'subject-only'},{id:'left'}];
+const enrollments=[{student_id:'own',year_id:'current',class_id:'c',ends_on:null},{student_id:'left',year_id:'current',class_id:'c',ends_on:'2026-10-01'}];
+assert.deepEqual(homeroomStudents({profile:teacher,year:'current',classes,enrollments,students}),[{id:'own'}]);
+assert.equal(canOpenPage('evaluations',{is_admin:true},'past',classes),true);
+console.log('PASS: homeroom menu by year and role; only current homeroom students appear.');

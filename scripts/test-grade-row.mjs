@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {gradeCells} from '../src/grade-row.js';
+import {normalizeGrade} from '../src/grade-input.js';
+assert.match(gradeCells('a',{grade_code:'9+',assignments:90},false).join(''),/הוזן ✓/);
+assert.match(gradeCells('a',{grade_code:'9+',assignments:90},false).join(''),/data-edit-grade/);
+assert.doesNotMatch(gradeCells('a',{grade_code:'9+',assignments:90},true).join(''),/data-edit-grade/);
+assert.match(gradeCells('a',null,false).join(''),/טרם הוזן/);
+assert.match(gradeCells('a',{assignments:90},false).join(''),/הוזן חלקית/);
+assert.equal(normalizeGrade(' 8 - 9 '),'8–9');
+assert.equal(normalizeGrade('9+'),'9+');
+console.log('PASS: saved status, partial status, edit action, locked state and grade direction normalization.');
